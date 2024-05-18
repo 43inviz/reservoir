@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Reservoir.h"
-#include <cstring>
+#include <string>
 using namespace std;
 
 void resMenuList() {
@@ -16,56 +16,67 @@ void resMenuList() {
 }
 
 int searchedResIndex(const Reservoir* arr,int size) {
-	int index = -1;
-	const int MAXSIZE = 100;
-	char* searchedName = new char[MAXSIZE];
-	
+	try {
+		int index = -1;
+		const int MAXSIZE = 100;
+		char* searchedName = new char[MAXSIZE];
 
-	cout << "Enter name of searched reservoir: ";
-	cin.getline(searchedName, MAXSIZE);
-	for (int i = 0; i < size; i++) {
-		if (strcmp(arr[i].getResName(), searchedName) == 0) {
-			index = i;
-			break;
+
+		cout << "Enter name of searched reservoir: ";
+		cin.getline(searchedName, MAXSIZE);
+		for (int i = 0; i < size; i++) {
+			if (strcmp(arr[i].getResName(), searchedName) == 0) {
+				index = i;
+				break;
+			}
+		}
+		if (index >= 0) {
+			return index;
+		}
+		else {
+			throw exception("Reservoir index cant be found\n");
 		}
 	}
-	if (index >= 0) {
-		return index;
+	catch (exception& ex) {
+		cout << ex.what() << endl;
 	}
-	else {
-		cout << "We cant find any matches\n";
-	}
+
 	
 }
 
 void delResFromArr(Reservoir* arr,int& size) {
 
-	Reservoir* newArr = new Reservoir[size - 1];
-	int index = searchedResIndex(arr, size);
-	if (index >= 0) {
-		for (int i = 0; i < size - 1; i++) {
-			if (i >= index) {
-				newArr[i].setResName(arr[i+1].getResName());
-				newArr[i].setResType(arr[i+1].getResType());
-				newArr[i].setWidth(arr[i + 1].getWidth());
-				newArr[i].setLength(arr[i + 1].getLength());
-				newArr[i].setDepth(arr[i + 1].getDepth());
+	try {
+		Reservoir* newArr = new Reservoir[size - 1];
+		int index = searchedResIndex(arr, size);
+		if (index >= 0) {
+			for (int i = 0; i < size - 1; i++) {
+				if (i >= index) {
+					newArr[i].setResName(arr[i + 1].getResName());
+					newArr[i].setResType(arr[i + 1].getResType());
+					newArr[i].setWidth(arr[i + 1].getWidth());
+					newArr[i].setLength(arr[i + 1].getLength());
+					newArr[i].setDepth(arr[i + 1].getDepth());
+				}
+				else if (i < index) {
+					newArr[i].setResName(arr[i].getResName());
+					newArr[i].setResType(arr[i].getResType());
+					newArr[i].setWidth(arr[i].getWidth());
+					newArr[i].setLength(arr[i].getLength());
+					newArr[i].setDepth(arr[i].getDepth());
+				}
 			}
-			else if (i < index) {
-				newArr[i].setResName(arr[i].getResName());
-				newArr[i].setResType(arr[i].getResType());
-				newArr[i].setWidth(arr[i].getWidth());
-				newArr[i].setLength(arr[i].getLength());
-				newArr[i].setDepth(arr[i].getDepth());
-			}
+			size--;
+			delete[] arr;
+			arr = newArr;
 		}
-		size--;
-		delete[] arr;
-		arr = newArr;
+		else {
+			throw exception("can`t find any matches for delete\n");
+			delete[]newArr;
+		}
 	}
-	else {
-		cout << "We can`t find any matches\n";
-		delete[]newArr;
+	catch(exception& ex){
+		cout << ex.what() << endl;
 	}
 
 	
@@ -91,33 +102,47 @@ void addRes(Reservoir*& arr, int& size) {
 }
 
 void showRes(Reservoir* arr, int&size) {
-	if (arr != nullptr) {
-		for (int i = 0; i < size; i++) {
-			arr[i].showRes();
+
+	try {
+		if (arr != nullptr) {
+			for (int i = 0; i < size; i++) {
+				arr[i].showRes();
+			}
+		}
+		else {
+			throw exception("No reservoir in array\n");
 		}
 	}
-	else {
-		cout << "No reservoir in array\n";
+	catch (exception& ex) {
+		cout << ex.what() << endl;
 	}
 }
 
 void compareResBySquare(Reservoir* arr,int size) {
 
-	int fstIndex = searchedResIndex(arr, size);
-	int secIndex = searchedResIndex(arr, size);
-	int result = arr[fstIndex].reservoirSquareCmp(arr[secIndex]);
-	if (fstIndex >= 0 && secIndex >= 0) {
-		if (result == 0) {
-			cout << "Reservoirs equal\n";
+	try {
+		int fstIndex = searchedResIndex(arr, size);
+		int secIndex = searchedResIndex(arr, size);
+		int result = arr[fstIndex].reservoirSquareCmp(arr[secIndex]);
+		if (fstIndex >= 0 && secIndex >= 0) {
+			if (result == 0) {
+				cout << "Reservoirs equal\n";
+			}
+			else if (result == 1) {
+				cout << "Reservoir  '" << arr[fstIndex].getResName() << "'  is larger\n";
+				cout << arr[fstIndex].reservoirSquare() << "m^3" << endl;
+			}
+			else if (result == -1) {
+				cout << "Reservoir " << arr[secIndex].getResName() << " is larger\n";
+				cout << arr[secIndex].reservoirSquare() << "m^3" << endl;
+			}
 		}
-		else if (result == 1) {
-			cout << "Reservoir  '" << arr[fstIndex].getResName() << "'  is larger\n";
-			cout << arr[fstIndex].reservoirSquare() <<"m^3" << endl;
+		else {
+			throw  exception("Wrong index by sqaure\n");
 		}
-		else if (result == -1) {
-			cout << "Reservoir " << arr[secIndex].getResName() << " is larger\n";
-			cout << arr[secIndex].reservoirSquare() << "m^3" << endl;
-		}
+	}
+	catch (exception& ex) {
+		cout << ex.what() << endl;
 	}
 
 }
@@ -160,7 +185,10 @@ int main() {
 			delResFromArr(resArr, size);
 			break;
 		case 4: 
-			compareResBySquare(resArr,size);
+			
+			compareResBySquare(resArr, size);
+			
+			
 			break;
 		case 5:
 			compareResByTypeName(resArr, size);
